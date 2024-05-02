@@ -8,7 +8,7 @@ This assignment focused on data visualization. The dataset I chose to use for th
 
 # Poster
 
-The purpose of this assignment is to create a research project, incorporating data visualization and regression testing. I chose a dataset on perpetrators of terrorist attacks to see whether certain demographic characteristics were prominent among perpetrators. I also wanted to examine the role of online radicalization on young and unmarried men (since men made up the vast majority of perpetrators) and used a regression table to see whether online radizalization was a statistically signficiant factor. 
+The purpose of this assignment is to create a research project, incorporating data visualization and regression testing. I chose a dataset on perpetrators of terrorist attacks to see whether certain demographic characteristics were prominent among perpetrators. I also wanted to examine the role of online radicalization on young and unmarried men (since men made up the vast majority of perpetrators) and used a regression table to see whether online radizalization was a statistically signficiant factor. I began the project by creating a hypothesis that could be tested, and chose to highlight a few variables that would be easy to understand for outside audiences. In addition to recoding a variable, I created a regression table to test my hypothesis and examine the relationship between online radicalizaiton and age and marital status.
 
 
 # Exemplary Code Chunk
