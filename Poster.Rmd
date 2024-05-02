@@ -1,0 +1,140 @@
+---
+title: Analysis of Terrorist Attack Perpetrators
+author:
+  - name: Leah Shiferaw
+    affil: 
+affiliation: 
+  - num: 
+    address: American University SIS | ls8820a@american.edu | https://github.com/leah-shiferaw 
+  - num: 
+    address: 
+column_numbers: 3
+logoright_name: 
+output: 
+  posterdown::posterdown_html:
+    self_contained: true
+bibliography: packages.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(patchwork)
+library(stargazer)
+library(knitr)
+library(broom)
+
+```
+
+# Introduction
+
+When terrorist attacks occur, it leads the public in search of a terrorist profile. Although studies have shown that no one “terrorist type” exits, this analysis will provide some common demographic characteristics of individuals that were charged with or died in terrorist attacks. It will also analyze the impact of online radicalization in the perpetrators attempting to conduct terrorist attacks.The data have been taken from a dataset called “Terrorism Cases Since 2001” by Carl Lewis from The New America Foundation and covers information about perpetrators of terrorism cases from 2001 to 2016. 
+
+## Hypothesis:
+
+Young, unmarried men are more likely to be radicalized online and subsequently carry out terrorist attacks.
+
+In addition to testing the above hypothesis, this analysis has the following objectives:
+
+1. To understand what (if any) common demographic characteristics exist among perpetrators. 
+2. To examine the role of online radicalization on teens and young adults.
+
+# Methodology
+
+This analysis examines several key variables to understand common demographic characteristics among perpetrators of terrorist attacks. Age and gender allow us to understand the age distribution of attackers and whether men or women are more common perpetrators of attacks. Marital status provides insight into the social ties of perpetrators, while online radicalization serves as a binary variable indicating the influence of social media platforms in the radicalization process.
+
+To investigate the impact of online radicalization ("char_online_radicalization"), logistic regression models will be employed. These models will assess the relationship between demographic factors (such as age, gender, and marital status) and online radicalization status. Statistical tests will be conducted to determine the significance of these relationships and evaluate the strength of the associations.The online radizalization variable captures the presence or absence of online radicalization among perpetrators and serves as a proxy for the influence of online platforms in promoting extremist ideologies or facilitating terrorist activities.
+
+"Char_online_radicalization" was re-coded from "Yes" or "No", to "1" or "O" to indicate whether an individual was or was not radizalized online. The determination of online radicalization status was based on various factors, including the perpetrator's online activities, communication patterns, and affiliations with online extremist individuals, groups, or ideologies. Descriptive statistics were calculated to examine the distribution of demographic characteristics among perpetrators.
+
+
+```{r perpetrators, out.width='80%', include=FALSE}
+
+perpetrators = read_csv("names_of_perpetrators.csv")
+
+perpetrators2 = perpetrators |>
+  select(gender, age, marital_status, citizenship_status, 
+         char_contact_with_foreign_militant, char_online_radicalization)
+
+```
+
+# Analysis
+
+An examination of the gender of perpetrators shows that the overwhelming majority of attackers are men.
+
+```{r gender, out.width='80%', fig.align='center', fig.height=5, warning=FALSE}
+
+summary_table = perpetrators2 |>
+  count(gender) |>
+kable(caption = "Summary of Gender Distribution", align = "c", format = "html")
+summary_table
+
+```
+
+An examination of the gender of perpetrators shows that the overwhelming majority (369 attackers, or almost 93%) of attackers are men. 28 attackers, or almost 7% of the attackers were women. 
+
+```{r age-plot, out.width='80%', fig.align='center', fig.height=5, warning=FALSE}
+
+perpetrators2 |>
+  ggplot(aes(x = age)) +
+  geom_bar(fill = "darkgreen", width = 0.5) + 
+  labs(x = "Age", y = "Count") +
+  ggtitle("Age of Perpetrators") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major = element_blank(),  
+    panel.grid.minor = element_blank()  
+  )
+
+```
+
+The ages of perpetrators range from a minimum of 15 to a maximum of 76 years old. The median age, which represents the midpoint of the age distribution, is 26, indicating that half of the perpetrators are younger than 26 and half are older. The average age of terrorist attack perpetrators in the data set is 29 years old with slight skew towards older ages due to the presence of outliers. The quartile values further describe the age distribution, with 25% of perpetrators aged 22 or younger and 25% aged 33 or older.
+
+
+```{r marital-plot, out.width='80%', fig.align='center', fig.height=5, warning=FALSE}
+
+perpetrators2 |>
+    ggplot(aes(x = marital_status)) +
+    geom_bar(fill = "navy", width = 0.5) + 
+    labs(x = "Marital Status", y = "Count") +
+    ggtitle("Marital Status of Perpetrators") +
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank())
+```
+
+The largest proportion of perpetrators, accounting for 170 individuals, is classified as unmarried or single, representing a significant portion of the dataset. Following this, the next most common status is married, with 145 individuals identified as such. A smaller number of individuals are reported as divorced, split, or widowed, with 20, 5, and 2 individuals respectively. 55 individuals in the dataset had an unknown marital status.
+
+
+# Regression Testing
+
+```{r log-regression, echo=FALSE, warning=FALSE}
+
+perpetrators3 <- perpetrators2 %>%
+  mutate(char_online_radicalization = ifelse(char_online_radicalization == "yes", 1, 0))
+
+model <- glm(char_online_radicalization ~ age + marital_status, data = perpetrators3, family = binomial)
+
+tidy_model <- tidy(model)
+
+kable(tidy_model, caption = "Influence of Online Radicalization on Young Adults", format = "html")
+
+
+```
+
+# Key Findings
+
+Based on the logistical regression model, age and marital status have a p-value of 1. This p-value shows that there is no significant relationship between age, marital status, and online radicalization. Specifically, age does not appear to be a significant predictor of online radicalization in this study. The same is said for marital status, where a perpetrator's marital status does not have a statistically significant impact on online radicalization among young adults in the analyzed dataset.
+
+
+
+# References
+
+The was downloaded from the "Terrorism Cases, 2001 - 2016" which was downloaded from Data World: https://data.world/carlvlewis/terrorism-cases-2001-2016. More information on the project can also be found here: https://www.newamerica.org/future-security/reports/terrorism-in-america/. 
+
+Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
