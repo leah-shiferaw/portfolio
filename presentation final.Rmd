@@ -1,0 +1,203 @@
+---
+title: "Dataset on Suicide Attacks"
+author: "Leah Shiferaw"
+date: "2024-03-24"
+output:
+  powerpoint_presentation: default
+  beamer_presentation: default
+---
+
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(ggplot2)
+library(knitr)
+library(readxl)
+library(patchwork)
+
+
+dsat = "dsat_dist_2020_10.xlsx"
+df = excel_sheets(dsat) |>
+  set_names() |>
+  map_dfr(~ read_excel(dsat, sheet = .x), .id = "dsat")
+
+df2 = df |>
+  select(date_year, weapon_txt, admin0_txt, group_name)
+
+```
+
+## Overview of the data
+
+The Database on Suicide Attacks (DSAT) was created by researchers at the 
+University of Chicago's Project on Security and Threats (CPOST) and 
+examines worldwide suicide attacks from 1982 to 2019. The data were collected through database searches, Google alerts, search engine and social media searches.
+
+
+The goal of this analysis is to understand what trends exist in the weapons, countries, years, and groups that conducted suicide attacks. 
+
+
+
+## Overview of variables
+
+Top groups conducting suicide attacks
+
+```{r top groups}
+
+top_groups = df2 |>
+  filter(!is.na(group_name)) |>
+  count(group_name, name = "attack_count") |>
+  arrange(desc(attack_count)) |>
+  head(5)
+
+kable(top_groups, caption = "Top Five Groups")
+knitr::kable(top_groups, caption = "Top Five Groups")
+
+```
+
+## Top countries in which suicide attacks occurred
+
+```{r top countries}
+
+top_countries = df2 |>
+  filter(!is.na(admin0_txt)) |>
+  count(admin0_txt, name = "attack_location") |>
+  arrange(desc(attack_location)) |>
+  head(5)
+
+kable(top_countries, caption = "Top Five Countries")
+knitr::kable(top_countries, caption = "Top Five Countries")
+
+```
+
+## Analysis 1: Suicide attacks by year
+
+
+```{r}
+
+summary(df2$date_year)
+
+df3 = df2 |>
+  count(date_year) |>
+  rename(n = n)
+
+top_years = df2 |>
+  filter(!is.na(date_year)) |>
+  count(date_year, name = "attack_year") |>
+  arrange(desc(attack_year)) |>
+  head(5)
+
+kable(top_years, caption = "Top Five Attack Years")
+knitr::kable(top_years, caption = "Top Five Attack Years")
+
+ggplot(df3, aes(x = date_year, y = n)) +
+  geom_line(color = "#0069c0") +
+  geom_point(color = "black", size = 1) +
+  labs(x = "Year", y = "Count", title = "Suicide Attacks by Year") +
+  scale_y_continuous(limits = c(0, 1000)) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+date1 = subset(df3, date_year >= 1982 & date_year <= 2000)
+
+plot1 = ggplot(date1, aes(x = date_year, y = n)) +
+  geom_line(color = "#0069c0") +
+  geom_point(color = "black", size = 2) +
+  labs(x = "Year", y = "Count", title = "Suicide Attacks: 1982 to 2000") +
+  scale_y_continuous(limits = c(0, 1000)) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+date2 = subset(df3, date_year >= 2001 & date_year <= 2019)
+
+plot2 = ggplot(date2, aes(x = date_year, y = n)) +
+  geom_line(color = "#0069c0") +
+  geom_point(color = "black", size = 2) +
+  labs(x = "Year", y = "Count", title = "Suicide Attacks: 2001 to 2019") +
+  scale_y_continuous(limits = c(0, 1000)) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+print(plot1)
+print(plot2)
+
+combined_plots <- plot1 + plot2
+combined_plots
+print(combined_plots)
+
+```
+
+## Analysis 2: Most common types of weapons
+
+The researchers have identified 17 types of weapons used to carry out suicide attacks. The top five most frequently used weapons were:
+
+```{r weapon types}
+
+weapons = df2 |>
+  count(weapon_txt) |>
+  arrange(desc(n)) |> 
+  filter(!is.na(weapon_txt))
+  
+top_weapons = head(weapons, 5)  
+
+kable(top_weapons, caption = "Top Five Weapons")
+knitr::kable(top_weapons, caption = "Top Five Weapons")
+
+```
+
+## Weapon Types by Year
+
+
+```{r top 5 weapons}
+
+weapon_counts = df2 |>
+  count(date_year, weapon_txt) |>
+  arrange(date_year, desc(n)) |>
+  group_by(date_year) |>
+  slice_head(n = 5) |>
+  ungroup()
+
+selected_weapons = c("Car bomb", "Belt bomb", "Truck bomb", "Unspecified", "Motorcycle bomb")
+
+
+filtered_df = df2 |>
+  filter(weapon_txt %in% selected_weapons)
+
+weapon_counts = filtered_df |>
+  count(date_year, weapon_txt) |>
+  arrange(date_year, desc(n)) |>
+  group_by(date_year) |>
+  slice_head(n = 5) |>
+  ungroup()
+
+```
+
+```{r combined plots, fig.width=11, fig.height=6}
+plot3 = ggplot(top_weapons, aes(x = reorder(weapon_txt, n), y = n, fill = weapon_txt)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Weapon Type", y = "Count", title = "Top Five Most Frequent Weapon Types") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+plot4 = ggplot(weapon_counts, aes(x = date_year, y = n, color = weapon_txt)) +
+  geom_line() +
+  labs(x = "Year", y = "Count", title = "Top Five Weapons by Year") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+combined_plots <- plot3 + plot4
+combined_plots
+
+print(ggplot)
+
+
+```
+
+
+
