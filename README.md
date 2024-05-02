@@ -3,7 +3,7 @@
 
 # Presentation
 
-This assignment — with a focus on visualization. The dataset I chose to use for this assignment is the Dataset on Suicide Attacks (DSAT), a project hosted by the University of Chicago’s Project on Security and Threats (CPOST). I was interested in seeing what groups and countries conducted or had the most suicide attacks occur, and how certain world events (Global War on Terror, rise in ISIS and other groups, etc.) may have had an impact in the frequency of terrorist attacks. For each variable I examined, I used data wrangling skills to select the top 5 of each variable, and used my knowledge of visualization to make effective and visually appealing graphs and charts.
+This assignment focused on data visualization. The dataset I chose to use for this assignment is the Dataset on Suicide Attacks (DSAT), a project hosted by the University of Chicago’s Project on Security and Threats (CPOST). I was interested in seeing what groups and countries conducted or had the most suicide attacks occur, and how certain world events (Global War on Terror, rise in ISIS and other groups, etc.) may have had an impact in the frequency of terrorist attacks. For each variable I examined, I used data wrangling skills to select the top 5 of each variable, and used my knowledge of visualization to make effective and visually appealing graphs and charts.
 
 
 # Poster
